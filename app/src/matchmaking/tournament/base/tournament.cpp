@@ -114,6 +114,14 @@ void BaseTournament::playGame(const GamePair<EngineConfiguration, EngineConfigur
     const auto white_name = engine_configs.white.name;
     const auto black_name = engine_configs.black.name;
 
+    if (!core.get().cpus.empty()) {
+#if defined(__linux__)
+        affinity::setAffinity(core.get().cpus, gettid());
+#elif defined(_WIN32)
+        affinity::setAffinity(core.get().cpus, GetCurrentProcessId());
+#endif
+    }
+
     auto white_engine = engine_cache_.getEntry(white_name, engine_configs.white, rl);
     auto black_engine = engine_cache_.getEntry(black_name, engine_configs.black, rl);
 
